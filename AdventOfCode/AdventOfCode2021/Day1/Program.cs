@@ -14,13 +14,14 @@ namespace AdventOfCode2021.Day1
                     nameof(args));
             }
 
+            string filename = args[0];
             switch (ParsePuzzleSolvingMode(args[1]))
             {
                 case PuzzleSolvingMode.Part1:
-                    SolvePuzzlePart1(args[0]);
+                    SolvePuzzlePart1(filename);
                     break;
                 case PuzzleSolvingMode.Part2:
-                    SolvePuzzlePart2(args[0]);
+                    SolvePuzzlePart2(filename);
                     break;
             }
         }
@@ -42,39 +43,37 @@ namespace AdventOfCode2021.Day1
         {
             try
             {
-                bool isFirstMeasurement = true;
-                int previousDepthMeasurement = default;
-                int numberOfTimesCurrentMeasurementWasHigherThanPrevious = 0;
-                
-                foreach (int depthMeasurement in File.ReadLines(filename).ToIntegers())
-                {
-                    if (isFirstMeasurement)
-                    {
-                        isFirstMeasurement = false;
-                    }
-                    else
-                    {
-                        if (depthMeasurement > previousDepthMeasurement)
-                        {
-                            numberOfTimesCurrentMeasurementWasHigherThanPrevious += 1;
-                        }
-                    }
-
-                    previousDepthMeasurement = depthMeasurement;
-                }
+                var numberOfTimesCurrentMeasurementWasHigherThanPrevious =
+                    File.ReadLines(filename)
+                        .ToIntegers()
+                        .CountNumberOfTimesCurrentElementIsHigherThanPreviousElement();
                 
                 Console.WriteLine("How many measurements are larger than the previous measurement?");
                 Console.WriteLine(numberOfTimesCurrentMeasurementWasHigherThanPrevious);
             }
             catch (Exception e)
             {
-                throw new FormatException($"Puzzle input should have a single integer value per line in the file.", e);
+                throw new FormatException($"Puzzle input should exist and have a single integer value per line in the file.", e);
             }
         }
 
-        private static void SolvePuzzlePart2(string s)
+        private static void SolvePuzzlePart2(string filename)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var numberOfTimesCurrentMeasurementWasHigherThanPrevious =
+                    File.ReadLines(filename)
+                        .ToIntegers()
+                        .ToSumsOfSlidingWindowOfSize3()
+                        .CountNumberOfTimesCurrentElementIsHigherThanPreviousElement();
+                
+                Console.WriteLine("How many measurements are larger than the previous measurement using a sliding window of size 3?");
+                Console.WriteLine(numberOfTimesCurrentMeasurementWasHigherThanPrevious);
+            }
+            catch (Exception e)
+            {
+                throw new FormatException($"Puzzle input should exist and have a single integer value per line in the file.", e);
+            }
         }
     }
 }

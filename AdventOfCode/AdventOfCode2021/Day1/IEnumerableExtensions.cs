@@ -17,5 +17,36 @@ namespace AdventOfCode2021.Day1
         {
             return integersAsStrings.Select(int.Parse);
         }
+
+        public static int CountNumberOfTimesCurrentElementIsHigherThanPreviousElement(
+            this IEnumerable<int> source)
+        {
+            bool isFirstElement = true;
+            int previousElement = default;
+            int numberOfTimesCurrentElementWasHigherThanPrevious = 0;
+                
+            foreach (int element in source)
+            {
+                if (isFirstElement)
+                {
+                    isFirstElement = false;
+                }
+                else
+                {
+                    if (element > previousElement)
+                    {
+                        numberOfTimesCurrentElementWasHigherThanPrevious += 1;
+                    }
+                }
+
+                previousElement = element;
+            }
+
+            return numberOfTimesCurrentElementWasHigherThanPrevious;
+        }
+
+        public static IEnumerable<int> ToSumsOfSlidingWindowOfSize3(
+            this IEnumerable<int> source) =>
+            new SlidingWindowOf3SummationIterator(source);
     }
 }

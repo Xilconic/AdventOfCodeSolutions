@@ -48,6 +48,7 @@ Instead, consider sums of a **three-measurement sliding window**.
 Again considering the above example:
 
 ```   
+199  A
 200  A B    
 208  A B C  
 210    B C D
