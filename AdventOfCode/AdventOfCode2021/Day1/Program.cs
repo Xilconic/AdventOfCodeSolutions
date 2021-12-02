@@ -40,35 +40,38 @@ namespace AdventOfCode2021.Day1
 
         private static void SolvePuzzlePart1(string filename)
         {
-            bool isFirstMeasurement = true;
-            int previousDepthMeasurement = default;
-            int numberOfTimesCurrentMeasurementWasHigherThanPrevious = 0;
-            foreach (string line in File.ReadLines(filename))
+            try
             {
-                if (!int.TryParse(line, out int depthMeasurement))
+                bool isFirstMeasurement = true;
+                int previousDepthMeasurement = default;
+                int numberOfTimesCurrentMeasurementWasHigherThanPrevious = 0;
+                
+                foreach (int depthMeasurement in File.ReadLines(filename).ToIntegers())
                 {
-                    throw new FormatException($"Puzzle input should have a single integer value per line in the file. Instead, read unexpected {line}.");
-                }
-
-                if (isFirstMeasurement)
-                {
-                    isFirstMeasurement = false;
-                }
-                else
-                {
-                    if (depthMeasurement > previousDepthMeasurement)
+                    if (isFirstMeasurement)
                     {
-                        numberOfTimesCurrentMeasurementWasHigherThanPrevious += 1;
+                        isFirstMeasurement = false;
                     }
-                }
+                    else
+                    {
+                        if (depthMeasurement > previousDepthMeasurement)
+                        {
+                            numberOfTimesCurrentMeasurementWasHigherThanPrevious += 1;
+                        }
+                    }
 
-                previousDepthMeasurement = depthMeasurement;
+                    previousDepthMeasurement = depthMeasurement;
+                }
+                
+                Console.WriteLine("How many measurements are larger than the previous measurement?");
+                Console.WriteLine(numberOfTimesCurrentMeasurementWasHigherThanPrevious);
             }
-            
-            Console.WriteLine("How many measurements are larger than the previous measurement?");
-            Console.WriteLine(numberOfTimesCurrentMeasurementWasHigherThanPrevious);
+            catch (Exception e)
+            {
+                throw new FormatException($"Puzzle input should have a single integer value per line in the file.", e);
+            }
         }
-        
+
         private static void SolvePuzzlePart2(string s)
         {
             throw new NotImplementedException();
