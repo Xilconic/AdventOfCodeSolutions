@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 
 namespace AdventOfCode2021.Day3
@@ -21,6 +23,7 @@ namespace AdventOfCode2021.Day3
                     SolvePart1(filename);
                     break;
                 case PuzzleSolvingMode.Part2:
+                    SolvePart2(filename);
                     break;
             }
         }
@@ -74,6 +77,92 @@ namespace AdventOfCode2021.Day3
             Console.WriteLine("What is the power consumption of the submarine?");
             Console.WriteLine(result);
         }
+        
+        private static void SolvePart2(string filename)
+        {
+            int binarySize = 0;
+            var binaryNumbers = new List<string>();
+            foreach (string binaryValueAsString in File.ReadLines(filename))
+            {
+                if (binarySize == 0)
+                {
+                    binarySize = binaryValueAsString.Length;
+                }
+                
+                binaryNumbers.Add(binaryValueAsString);
+            }
+
+            var oxygenGeneratorRating = ProgressiveFilter(binaryNumbers, binarySize, SplittingStrategy.Majority, TiebreakerMode.UseValuesWithOneAtIndex);
+            var co2ScrubberRating = ProgressiveFilter(binaryNumbers, binarySize, SplittingStrategy.Minority, TiebreakerMode.UseValuesWithZeroAtIndex);
+            
+            // The integers can deal simultaneously with binary and decimal reasoning.
+            uint lifeSupportRating = oxygenGeneratorRating * co2ScrubberRating;
+            Console.WriteLine("What is the life support rating of the submarine?");
+            Console.WriteLine(lifeSupportRating);
+        }
+
+        private static uint ProgressiveFilter(
+            IReadOnlyList<string> binaryNumbers,
+            int binarySize,
+            SplittingStrategy splittingStrategy,
+            TiebreakerMode tieBreakerStrategy)
+        {
+            for (int i = 0; i < binarySize; i++)
+            {
+                var binaryValuesWithOnesAtIndex = new List<string>(binaryNumbers.Count);
+                var binaryValuesWithZerosAtIndex = new List<string>(binaryNumbers.Count);
+                
+                // Are we done filtering? If yes, early return:
+                if (binaryNumbers.Count == 1)
+                {
+                    return Convert.ToUInt32(binaryNumbers[0], 2);
+                }
+                 
+                // Split the source collection in number that have a 1 or 0 at the given index:
+                foreach (string binaryNumber in binaryNumbers)
+                {
+                    if (binaryNumber[i] == '1')
+                    {
+                        binaryValuesWithOnesAtIndex.Add(binaryNumber);
+                    }
+                    else
+                    {
+                        binaryValuesWithZerosAtIndex.Add(binaryNumber);
+                    }
+                }
+                
+                // Select which split to keep and continue filtering using the next index:
+                if (binaryValuesWithOnesAtIndex.Count == binaryValuesWithZerosAtIndex.Count)
+                {
+                    switch (tieBreakerStrategy)
+                    {
+                        case TiebreakerMode.UseValuesWithOneAtIndex:
+                            binaryNumbers = binaryValuesWithOnesAtIndex;
+                            break;
+                        case TiebreakerMode.UseValuesWithZeroAtIndex:
+                            binaryNumbers = binaryValuesWithZerosAtIndex;
+                            break;
+                        default: throw new InvalidEnumArgumentException(nameof(tieBreakerStrategy), (int)tieBreakerStrategy, typeof(TiebreakerMode));
+                    }
+                }
+                else
+                {
+                    int halfSize = binaryNumbers.Count / 2;
+                    switch (splittingStrategy)
+                    {
+                        case SplittingStrategy.Majority:
+                            binaryNumbers = binaryValuesWithOnesAtIndex.Count > binaryValuesWithZerosAtIndex.Count ? binaryValuesWithOnesAtIndex : binaryValuesWithZerosAtIndex;
+                            break;
+                        case SplittingStrategy.Minority:
+                            binaryNumbers = binaryValuesWithOnesAtIndex.Count < binaryValuesWithZerosAtIndex.Count ? binaryValuesWithOnesAtIndex : binaryValuesWithZerosAtIndex;
+                            break;
+                        default: throw new InvalidEnumArgumentException(nameof(splittingStrategy), (int)splittingStrategy, typeof(SplittingStrategy));
+                    }
+                }
+            }
+
+            return Convert.ToUInt32(binaryNumbers[0], 2);
+        }
 
         private static PuzzleSolvingMode ParsePuzzleSolvingMode(string puzzlePartNumber)
         {
@@ -86,6 +175,18 @@ namespace AdventOfCode2021.Day3
                 2 => PuzzleSolvingMode.Part2,
                 _ => throw new ArgumentException($"2nd argument only supports values in the range [1,2]. Received {number}", "args[1]")
             };
+        }
+
+        private enum SplittingStrategy
+        {
+            Majority,
+            Minority
+        }
+
+        private enum TiebreakerMode
+        {
+            UseValuesWithOneAtIndex,
+            UseValuesWithZeroAtIndex,
         }
     }
 }
