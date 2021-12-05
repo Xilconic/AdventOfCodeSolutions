@@ -8,13 +8,13 @@ namespace AdventOfCode2021_Day4
     internal class BingoGame
     {
         private readonly Queue<int> _numbers;
-        private readonly IReadOnlyCollection<BingoCard> _bingoCards;
+        private readonly IList<BingoCard> _bingoCards;
         private BingoCard _winningBingoCard = null;
         private int _lastCalledNumber;
 
         public BingoGame(
             IEnumerable<int> numbers,
-            IReadOnlyCollection<BingoCard> bingoCards)
+            IList<BingoCard> bingoCards)
         {
             _numbers = new Queue<int>(numbers);
             _bingoCards = bingoCards;
@@ -69,6 +69,31 @@ namespace AdventOfCode2021_Day4
                 
                 // Assumption: There is always only 1 first winner.
                 _winningBingoCard = _bingoCards.FirstOrDefault(bingoCard => bingoCard.HasWon);
+            }
+        }
+        
+        public void PlayGameUntilAllBingoCardsWon()
+        {
+            while (_bingoCards.Count != 0)
+            {
+                // Assumption: all games will always result in a winner before emptying out '_numbers'.
+                _lastCalledNumber = _numbers.Dequeue();
+                var cardsThatWon = new List<BingoCard>();
+                foreach (BingoCard bingoCard in _bingoCards)
+                {
+                    bingoCard.DaubFor(_lastCalledNumber);
+                    
+                    if (bingoCard.HasWon)
+                    {
+                        cardsThatWon.Add(bingoCard);
+                        _winningBingoCard = bingoCard;
+                    }
+                }
+
+                foreach (BingoCard bingoCard in cardsThatWon)
+                {
+                    _bingoCards.Remove(bingoCard);
+                }
             }
         }
 

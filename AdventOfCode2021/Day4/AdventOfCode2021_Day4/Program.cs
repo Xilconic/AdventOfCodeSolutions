@@ -37,7 +37,12 @@ namespace AdventOfCode2021_Day4
         
         private static void SolvePuzzlePart2(string filename)
         {
-            throw new NotImplementedException();
+            var bingoGame = BingoGame.InitializeFromFile(filename);
+            bingoGame.PlayGameUntilAllBingoCardsWon();
+            
+            var finalScore = bingoGame.GetSumOfAllUnmarkedNumbersOfWinningBingoCard() * bingoGame.GetLastCalledNumber();
+            Console.WriteLine("What will your final score be if you choose that board?");
+            Console.WriteLine(finalScore);
         }
 
         private static PuzzleSolvingMode ParsePuzzleSolvingMode(string puzzlePartNumber)
