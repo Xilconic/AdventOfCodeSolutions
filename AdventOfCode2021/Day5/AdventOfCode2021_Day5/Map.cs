@@ -33,6 +33,37 @@ namespace AdventOfCode2021_Day5
                         _map[line.MinX, y] += 1;
                     }
                 }
+                else if (line.IsDiagonal)
+                {
+                    Point leftMostPoint, rightMostPoint;
+                    if (line.Point1.X < line.Point2.X)
+                    {
+                        leftMostPoint = line.Point1;
+                        rightMostPoint = line.Point2;
+                    }
+                    else
+                    {
+                        leftMostPoint = line.Point2;
+                        rightMostPoint = line.Point1;
+                    }
+
+                    int x = leftMostPoint.X;
+                    int y = leftMostPoint.Y;
+                    if (leftMostPoint.Y < rightMostPoint.Y)
+                    {
+                        for (; x <= rightMostPoint.X; x++, y++)
+                        {
+                            _map[x, y] += 1;
+                        }
+                    }
+                    else
+                    {
+                        for (; x <= rightMostPoint.X; x++, y--)
+                        {
+                            _map[x, y] += 1;
+                        }
+                    }
+                }
                 else
                 {
                     throw new NotImplementedException("Only support drawing vertical and horizontal lines.");

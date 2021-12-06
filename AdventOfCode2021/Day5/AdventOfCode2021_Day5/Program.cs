@@ -63,7 +63,36 @@ namespace AdventOfCode2021_Day5
         
         private static void SolvePuzzlePart2(string filename)
         {
-            throw new NotImplementedException();
+            var maxX = 0;
+            var maxY = 0;
+
+            var lines = new List<Line>();
+            foreach (string lineAsText in File.ReadLines(filename))
+            {
+                var line = Line.Parse(lineAsText);
+                // Ignore all non horizontal and non vertical lines:
+                if (line.IsHorizontal || line.IsVertical || line.IsDiagonal)
+                {
+                    if (line.MaxX > maxX)
+                    {
+                        maxX = line.MaxX;
+                    }
+
+                    if (line.MaxY > maxY)
+                    {
+                        maxY = line.MaxY;
+                    }
+
+                    lines.Add(line);
+                }
+            }
+
+            var map = new Map(maxX, maxY);
+            map.DrawLines(lines);
+            
+            int numberOfIntersectionLinePoints = map.GetNumberOfIntersections();
+            Console.WriteLine("At how many points do at least two lines overlap?");
+            Console.WriteLine(numberOfIntersectionLinePoints);
         }
 
         private static PuzzleSolvingMode ParsePuzzleSolvingMode(string puzzlePartNumber)

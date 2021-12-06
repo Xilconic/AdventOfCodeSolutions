@@ -4,8 +4,8 @@ namespace AdventOfCode2021_Day5
 {
     internal class Line
     {
-        private Point Point1 { get; }
-        private Point Point2 { get; }
+        public Point Point1 { get; }
+        public Point Point2 { get; }
 
         private Line(Point point1, Point point2)
         {
@@ -36,6 +36,7 @@ namespace AdventOfCode2021_Day5
 
             IsHorizontal = point1.Y == point2.Y;
             IsVertical = point1.X == point2.X;
+            IsDiagonal = (MaxX - MinX) == (MaxY - MinY);
         }
 
         public static Line Parse(string lineAsText)
@@ -54,5 +55,6 @@ namespace AdventOfCode2021_Day5
         
         public bool IsHorizontal { get; }
         public bool IsVertical { get; }
+        public bool IsDiagonal { get; }
     }
 }
