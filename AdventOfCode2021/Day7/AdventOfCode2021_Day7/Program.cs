@@ -46,7 +46,26 @@ namespace AdventOfCode2021_Day7
 
         private static void SolvePuzzlePart2(string filename)
         {
-            throw new NotImplementedException();
+            foreach (string line in File.ReadLines(filename))
+            {
+                var crabPositions = line.Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                    .Select(int.Parse)
+                    .ToArray();
+                var max = crabPositions.Max();
+                var minimumFuelCost= Enumerable.Range(0, max + 1)
+                    .Select(index => crabPositions.Sum(p => CalculateFuelCostPart2(p, index)))
+                    .Min();
+                
+                Console.WriteLine("How much fuel must they spend to align to that position?");
+                Console.WriteLine(minimumFuelCost);
+            }
+        }
+
+        private static int CalculateFuelCostPart2(int crabPosition, int intendedLocation)
+        {
+            // Note: This method can be optimized by making it recursive with memoization
+            var distance = Math.Abs(crabPosition - intendedLocation);
+            return Enumerable.Range(0, distance+1).Sum();
         }
 
         private static PuzzleSolvingMode ParsePuzzleSolvingMode(string puzzlePartNumber)
