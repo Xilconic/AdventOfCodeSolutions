@@ -33,9 +33,7 @@ namespace AdventOfCode2021_Day6
             var ocean = new Ocean();
             foreach (string line in File.ReadLines(filename))
             {
-                var lanternfishesToInitializeOceanWith = line.Split(",", StringSplitOptions.TrimEntries|StringSplitOptions.RemoveEmptyEntries)
-                    .Select(int.Parse)
-                    .Select(age => Lanternfish.CreatePreexistingWithAge(age));
+                IEnumerable<Lanternfish> lanternfishesToInitializeOceanWith = GetLanternfishes(line);
                 ocean.InsertLanternfish(lanternfishesToInitializeOceanWith);
             }
 
@@ -50,7 +48,22 @@ namespace AdventOfCode2021_Day6
 
         private static void SolvePuzzlePart2(string filename)
         {
-            throw new NotImplementedException();
+            // Note: For such a high number of simulation days, we're exceeding int.MaxValue.
+            // Therefore need to make use of more efficient reasoning about populations...
+            var ocean = new LifecycleBasedOcean();
+            foreach (string line in File.ReadLines(filename))
+            {
+                IEnumerable<Lanternfish> lanternfishesToInitializeOceanWith = GetLanternfishes(line);
+                ocean.InsertLanternfish(lanternfishesToInitializeOceanWith);
+            }
+
+            for (int i = 0; i < 256; i++)
+            {
+                ocean.SimulateDay();
+            }
+            
+            Console.WriteLine("How many lanternfish would there be after 256 days?");
+            Console.WriteLine(ocean.GetNumberOfLanternfish());
         }
 
         private static PuzzleSolvingMode ParsePuzzleSolvingMode(string puzzlePartNumber)
@@ -65,59 +78,13 @@ namespace AdventOfCode2021_Day6
                 _ => throw new ArgumentException($"2nd argument only supports values in the range [1,2]. Received {number}", "args[1]")
             };
         }
-    }
-
-    internal class Lanternfish
-    {
-        private int _age;
-
-        private Lanternfish(int age)
-        {
-            _age = age;
-        }
-
-        public bool WantsToSpawnBabyLanternfish => _age == -1;
-
-        public static Lanternfish CreatePreexistingWithAge(int age) => new(age);
-
-        public void ProcessAging()
-        {
-            _age -= 1;
-        }
-
-        public Lanternfish CreateOffspring()
-        {
-            _age = 6;
-            return new Lanternfish(8);
-        }
-    }
-
-    internal class Ocean
-    {
-        private readonly List<Lanternfish> _lanternfishes = new();
         
-        public void InsertLanternfish(IEnumerable<Lanternfish> lanternfishes)
+        private static IEnumerable<Lanternfish> GetLanternfishes(string line)
         {
-            _lanternfishes.AddRange(lanternfishes);
-        }
-
-        public void SimulateDay()
-        {
-            var numberOfLanternfishAtStartOfDay = GetNumberOfLanternfish();
-            for (int i = 0; i < numberOfLanternfishAtStartOfDay; i++)
-            {
-                Lanternfish fish = _lanternfishes[i];
-                fish.ProcessAging();
-                if (fish.WantsToSpawnBabyLanternfish)
-                {
-                    _lanternfishes.Add(fish.CreateOffspring());
-                }
-            }
-        }
-
-        public int GetNumberOfLanternfish()
-        {
-            return _lanternfishes.Count;
+            return line
+                .Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .Select(int.Parse)
+                .Select(Lanternfish.CreatePreexistingWithAge);
         }
     }
 }
