@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace AdventOfCode2021_Day9
@@ -38,7 +36,15 @@ namespace AdventOfCode2021_Day9
 
         private static void SolvePuzzlePart2(string filename)
         {
-            throw new NotImplementedException();
+            // Note: All basins are enclosed by the borders of the heightmap and '9' values.
+            HeightMap heightmap = HeightMap.FromFile(filename);
+            var answer = heightmap.GetBasins()
+                .OrderByDescending(b => b.Size)
+                .Take(3)
+                .Aggregate(1, (aggregate, basin) => aggregate * basin.Size);
+            
+            Console.WriteLine("What do you get if you multiply together the sizes of the three largest basins?");
+            Console.WriteLine(answer);
         }
 
         private static PuzzleSolvingMode ParsePuzzleSolvingMode(string puzzlePartNumber)
@@ -53,87 +59,5 @@ namespace AdventOfCode2021_Day9
                 _ => throw new ArgumentException($"2nd argument only supports values in the range [1,2]. Received {number}", "args[1]")
             };
         }
-    }
-
-    internal class HeightMap
-    {
-        private readonly int[,] _heightMap;
-
-        private HeightMap(int[,] heightMap)
-        {
-            _heightMap = heightMap;
-        }
-        
-        public static HeightMap FromFile(string filename)
-        {
-            var heightLines = new List<int[]>();
-            int maxX = 0;
-            foreach (string line in File.ReadLines(filename))
-            {
-                if (maxX == 0)
-                {
-                    maxX = line.Length;
-                }
-                
-                heightLines.Add(line.Select(c => int.Parse(c.ToString())).ToArray());
-            }
-
-            var heightMap = new int[maxX, heightLines.Count];
-            for (int y = 0; y < heightLines.Count; y++)
-            {
-                var heightLine = heightLines[y];
-                for (int x = 0; x < heightLine.Length; x++)
-                {
-                    heightMap[x,y] = heightLine[x];
-                }
-            }
-
-            return new HeightMap(heightMap);
-        }
-
-        public IEnumerable<int> GetLowPointsHeights()
-        {
-            return GetAllPoints()
-                .Where(IsLowPoint)
-                .Select(p => p.Height);
-        }
-
-        private IEnumerable<Point> GetAllPoints()
-        {
-            for (int X = 0; X < _heightMap.GetLength(0); X++)
-            {
-                for (int Y = 0; Y < _heightMap.GetLength(1); Y++)
-                {
-                    yield return new Point(X, Y, _heightMap[X, Y]);
-                }
-            }
-        }
-
-        private bool IsLowPoint(Point p)
-        {
-            if (p.X > 0 && p.Height >= _heightMap[p.X - 1, p.Y])
-            {
-                return false;
-            }
-
-            if (p.X < _heightMap.GetLength(0) - 1 && p.Height >= _heightMap[p.X + 1, p.Y])
-            {
-                return false;
-            }
-
-            if (p.Y > 0 && p.Height >= _heightMap[p.X, p.Y - 1])
-            {
-                return false;
-            }
-            
-            if (p.Y < _heightMap.GetLength(1) - 1 && p.Height >= _heightMap[p.X, p.Y + 1])
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        private record Point(int X, int Y, int Height);
     }
 }
