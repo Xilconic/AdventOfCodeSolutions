@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode2021_Day8
@@ -39,11 +41,6 @@ namespace AdventOfCode2021_Day8
                 string output3 = match.Groups["output3"].Value;
                 string output4 = match.Groups["output4"].Value;
 
-                NumberGuesses number1Guesses = GuessNumber(output1);
-                NumberGuesses number2Guesses = GuessNumber(output2);
-                NumberGuesses number3Guesses = GuessNumber(output3);
-                NumberGuesses number4Guesses = GuessNumber(output4);
-
                 if (IsUnambiguousDriverSignal(output1))
                 {
                     count += 1;
@@ -66,20 +63,6 @@ namespace AdventOfCode2021_Day8
             Console.WriteLine(count);
         }
 
-        private static NumberGuesses GuessNumber(string sevenSegmentDisplayDriverValue)
-        {
-            switch (sevenSegmentDisplayDriverValue.Length)
-            {
-                case 2: return NumberGuesses.One;
-                case 3: return NumberGuesses.Seven;
-                case 4: return NumberGuesses.Four;
-                case 5: return NumberGuesses.Two | NumberGuesses.Three | NumberGuesses.Five;
-                case 6: return NumberGuesses.Zero | NumberGuesses.Six | NumberGuesses.Nine;
-                case 7: return NumberGuesses.Eight;
-                default: throw new NotImplementedException();
-            }
-        }
-
         private static bool IsUnambiguousDriverSignal(string sevenSegmentDisplayDriverValue)
         {
             switch (sevenSegmentDisplayDriverValue.Length)
@@ -95,7 +78,35 @@ namespace AdventOfCode2021_Day8
 
         private static void SolvePuzzlePart2(string filename)
         {
-            throw new NotImplementedException();
+            long sumOfOutputValues = 0;
+            foreach (string lines in File.ReadLines(filename))
+            {
+                var tokenizedInput = Regex.Matches(lines, @"\w+");
+                // Note: tokenizedInput contains 10 driver signals, followed by 4 outputs to be decoded:
+                IEnumerable<string> driverSignals = tokenizedInput.Select(m => m.Value).Take(10);
+                var decoder = new SevenSegmentDecoder(driverSignals);
+
+                for (int i = 10; i < tokenizedInput.Count; i++)
+                {
+                    int decodedNumber = decoder.Decode(tokenizedInput[i].Value);
+                    switch (i)
+                    {
+                        case 10: // Thousands number
+                            decodedNumber *= 1000;
+                            break;
+                        case 11: // Hundreds number
+                            decodedNumber *= 100;
+                            break;
+                        case 12: // tens numbers
+                            decodedNumber *= 10;
+                            break;
+                    }
+                    sumOfOutputValues += decodedNumber;
+                }
+            }
+            
+            Console.WriteLine("What do you get if you add up all of the output values?");
+            Console.WriteLine(sumOfOutputValues);
         }
 
         private static PuzzleSolvingMode ParsePuzzleSolvingMode(string puzzlePartNumber)
@@ -109,21 +120,6 @@ namespace AdventOfCode2021_Day8
                 2 => PuzzleSolvingMode.Part2,
                 _ => throw new ArgumentException($"2nd argument only supports values in the range [1,2]. Received {number}", "args[1]")
             };
-        }
-
-        [Flags]
-        public enum NumberGuesses
-        {
-            Zero = 1, // 6 segments
-            One = 2, // 2 segments
-            Two = 4, // 5 segments
-            Three = 8, // 5 segments
-            Four = 16, // 4 segments
-            Five = 32, // 5 segments
-            Six = 64, // 6 segments
-            Seven = 128, // 3 segments
-            Eight = 256, // 7 segments
-            Nine = 512 // 6 segments
         }
     }
 }
