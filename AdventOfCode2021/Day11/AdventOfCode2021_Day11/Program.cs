@@ -38,7 +38,15 @@ namespace AdventOfCode2021_Day11
 
         private static void SolvePuzzlePart2(string filename)
         {
-            throw new NotImplementedException();
+            var stepnumber = 0;
+            var octopusGrid = OctopusGrid.FromFile(filename);
+            while (!octopusGrid.SynchronousFlashHappened)
+            {
+                octopusGrid.SimulateStep();
+                stepnumber += 1;
+            }
+            Console.WriteLine("What is the first step during which all octopuses flash?");
+            Console.WriteLine(stepnumber);
         }
 
         private static PuzzleSolvingMode ParsePuzzleSolvingMode(string puzzlePartNumber)

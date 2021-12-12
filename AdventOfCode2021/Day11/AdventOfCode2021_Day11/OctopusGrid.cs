@@ -15,6 +15,8 @@ namespace AdventOfCode2021_Day11
             _octopusEnergyLevels = octopusEnergyLevels;
         }
 
+        public bool SynchronousFlashHappened { get; private set; } = false;
+
         public static OctopusGrid FromFile(string filename)
         {
             var sizeX = 0;
@@ -84,6 +86,15 @@ namespace AdventOfCode2021_Day11
             {
                 _octopusEnergyLevels[octopus.X, octopus.Y] = 0;
                 _numberOfFlashes += 1;
+            }
+
+            if (octopiThatFlashed.Count == _octopusEnergyLevels.GetLength(0) * _octopusEnergyLevels.GetLength(1))
+            {
+                SynchronousFlashHappened = true;
+            }
+            else
+            {
+                SynchronousFlashHappened = false;
             }
         }
 
