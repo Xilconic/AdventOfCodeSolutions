@@ -36,7 +36,11 @@ namespace AdventOfCode2021_Day12
 
         private static void SolvePuzzlePart2(string filename)
         {
-            throw new NotImplementedException();
+            var cavePathFinder = CavePathFinder.FromFile(filename);
+            // Note: Cannot use pruner, because now a small cave could be visited twice...once.
+            var paths = cavePathFinder.GetAllPathsVisitingOnlyOneSmallCaveAtMostTwice();
+            Console.WriteLine("How many paths through this cave system are there that visit small caves at most once?");
+            Console.WriteLine(paths.Count);
         }
 
         private static PuzzleSolvingMode ParsePuzzleSolvingMode(string puzzlePartNumber)

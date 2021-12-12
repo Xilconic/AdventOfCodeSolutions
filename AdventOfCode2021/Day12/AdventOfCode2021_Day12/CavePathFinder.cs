@@ -82,5 +82,53 @@ namespace AdventOfCode2021_Day12
             
             return completedPaths;
         }
+
+        public IReadOnlyCollection<NodePath> GetAllPathsVisitingOnlyOneSmallCaveAtMostTwice()
+        {
+            // Note: In order to prevent infinite cycles, graph cannot have 2 big caves connecting to each other.
+            var paths = _cave.Start.ConnectedNodes
+                .Select(n => new NodePath(_cave.Start, n))
+                .ToHashSet(); // Made hashset, to speed up removal of elements from the list
+
+            var completedPaths = paths.Where(p => p.IsCompleted).ToList();
+            foreach (NodePath completedPath in completedPaths)
+            {
+                paths.Remove(completedPath);
+            }
+            while (paths.Count > 0)
+            {
+                var newPaths = new List<NodePath>();
+                foreach (NodePath path in paths)
+                {
+                    newPaths.AddRange(path.SlightlyScenicExplore());
+                }
+
+                foreach (NodePath newPath in newPaths)
+                {
+                    paths.Add(newPath);
+                }
+
+                var newlyCompletedPaths = new List<NodePath>();
+                var stuckPaths = new List<NodePath>();
+                foreach (NodePath path in paths)
+                {
+                    if (path.IsCompleted)
+                    {
+                        newlyCompletedPaths.Add(path);
+                    }
+                    else if (path.IsStuck)
+                    {
+                        stuckPaths.Add(path);
+                    }
+                }
+                foreach (NodePath completedPath in newlyCompletedPaths.Concat(stuckPaths))
+                {
+                    paths.Remove(completedPath);
+                }
+                completedPaths.AddRange(newlyCompletedPaths);
+            }
+            
+            return completedPaths;
+        }
     }
 }

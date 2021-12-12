@@ -7,6 +7,7 @@ namespace AdventOfCode2021_Day12
     internal class NodePath
     {
         private readonly List<Node> _travelList = new();
+        private bool _alreadyVisitedSmallCaveTwice = false;
         
         public NodePath(Node start, Node firstTraversal)
         {
@@ -22,7 +23,14 @@ namespace AdventOfCode2021_Day12
             _travelList.Add(latestTraversal);
             
             IsCompleted = IsEndNode(latestTraversal);
+            _alreadyVisitedSmallCaveTwice = TravelListContainsSameSmallCavernTwoTimes();
         }
+
+        private bool TravelListContainsSameSmallCavernTwoTimes() =>
+            _travelList
+                .Where(n => n.Type == NodeType.Small)
+                .GroupBy(n => n.Identifier)
+                .Max(n => n.Count()) == 2;
 
         public bool IsCompleted { get; private set; }
         public bool IsStuck { get; private set; } = false;
@@ -55,6 +63,45 @@ namespace AdventOfCode2021_Day12
             {
                 _travelList.Add(firstExploredNode);
                 IsCompleted = IsEndNode(firstExploredNode);                
+            }
+            else
+            {
+                // No more options available without violating backtracking on small caves!
+                IsStuck = true;
+            }
+
+            return newPaths;
+        }
+        
+        public IEnumerable<NodePath> SlightlyScenicExplore()
+        {
+            if(IsCompleted) return Array.Empty<NodePath>();
+
+            var newPaths = new List<NodePath>();
+            Node firstExploredNode = null;
+            foreach (Node node in _travelList[^1].ConnectedNodes.Where(n => n.Type != NodeType.Start))
+            {
+                if (node.Type == NodeType.Small && _travelList.Contains(node) && _alreadyVisitedSmallCaveTwice)
+                {
+                    // Do not revit the same small caves, with exception of 1 that we can visit 2x!
+                    continue;
+                }
+                
+                if (firstExploredNode is null)
+                {
+                    firstExploredNode = node;
+                }
+                else
+                {
+                    newPaths.Add(new NodePath(_travelList, node));
+                }
+            }
+
+            if (firstExploredNode != null)
+            {
+                _travelList.Add(firstExploredNode);
+                IsCompleted = IsEndNode(firstExploredNode);
+                _alreadyVisitedSmallCaveTwice = TravelListContainsSameSmallCavernTwoTimes();
             }
             else
             {
