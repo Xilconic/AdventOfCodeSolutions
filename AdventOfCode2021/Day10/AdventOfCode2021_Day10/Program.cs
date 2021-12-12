@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace AdventOfCode2021_Day10
 {
@@ -103,8 +104,64 @@ namespace AdventOfCode2021_Day10
 
         private static void SolvePuzzlePart2(string filename)
         {
-            throw new NotImplementedException();
+            var sum = 0;
+            var sortedScore = new SortedList<long, long>();
+            foreach (string line in File.ReadLines(filename))
+            {
+                bool isCorruptedLine = false;
+                var openingBraces = new Stack<char>();
+                foreach (char character in line)
+                {
+                    // Assume all 1st characters are always opening braces
+                    if (openingBraces.Count == 0)
+                    {
+                        openingBraces.Push(character);
+                    }
+                    else
+                    {
+                        if (IsOpeningNewChunk(character))
+                        {
+                            openingBraces.Push(character);
+                        }
+                        else if(IsClosingCurrentChunk(character, openingBraces.Peek()))
+                        {
+                            openingBraces.Pop();
+                        }
+                        else
+                        {
+                            // Corruption detected!
+                            isCorruptedLine = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!isCorruptedLine)
+                {
+                    long score = 0;
+                    foreach (char openingBrace in openingBraces)
+                    {
+                        score *= 5;
+                        score += GetAutocompletionScore(openingBrace);
+                    }
+                    
+                    sortedScore.Add(score, score);
+                }
+            }
+            
+            Console.WriteLine("What is the middle score?");
+            Console.WriteLine(sortedScore.ElementAt(sortedScore.Count/2).Value);
         }
+
+        private static long GetAutocompletionScore(char openingBrace) =>
+            openingBrace switch
+            {
+                '(' => 1,
+                '[' => 2,
+                '{' => 3,
+                '<' => 4,
+                _ => throw new NotImplementedException()
+            };
 
         private static PuzzleSolvingMode ParsePuzzleSolvingMode(string puzzlePartNumber)
         {
