@@ -46,5 +46,44 @@ namespace AdventOfCode2021_Day15
 
         public int GetRiskScore(Point2D point) => 
             _riskMap[point.X, point.Y];
+
+        public RiskMap CreateFullMap()
+        {
+            var originalSizeX = _riskMap.GetLength(0);
+            var originalSizeY = _riskMap.GetLength(1);
+            var fullRiskMap = new int[originalSizeX * 5, originalSizeY * 5];
+            for (int mapBlockX = 0; mapBlockX < 5; mapBlockX++)
+            {
+                for (int mapBlockY = 0; mapBlockY < 5; mapBlockY++)
+                {
+                    for (int sourceX = 0; sourceX < originalSizeX; sourceX++)
+                    {
+                        for (int sourceY = 0; sourceY < originalSizeY; sourceY++)
+                        {
+                            fullRiskMap[
+                                mapBlockX * originalSizeX + sourceX,
+                                mapBlockY * originalSizeY + sourceY
+                            ] = GetMapBlockValue(_riskMap[sourceX, sourceY], mapBlockX, mapBlockY);
+                        }
+                    }
+                }
+            }
+
+            return new RiskMap(fullRiskMap);
+        }
+
+        private int GetMapBlockValue(
+            int originalvalue,
+            int mapBlockX,
+            int mapBlockY)
+        {
+            var newValue = originalvalue + mapBlockX + mapBlockY;
+            while (newValue > 9)
+            {
+                newValue -= 9;
+            }
+
+            return newValue;
+        }
     }
 }

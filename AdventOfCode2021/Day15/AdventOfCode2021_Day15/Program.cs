@@ -37,7 +37,13 @@ namespace AdventOfCode2021_Day15
 
         private static void SolvePuzzlePart2(string filename)
         {
-            throw new NotImplementedException();
+            var map = RiskMap.FromFile(filename);
+            var fullSizeMap = map.CreateFullMap();
+            var pathFinder = new Pathfinder(fullSizeMap);
+            Traversal leastRiskyPath = pathFinder.GetLeastRiskyPath(); // Note very fast any more :/
+            
+            Console.WriteLine("What is the lowest total risk of any path from the top left to the bottom right?");
+            Console.WriteLine(leastRiskyPath.RiskScore);
         }
 
         private static PuzzleSolvingMode ParsePuzzleSolvingMode(string puzzlePartNumber)
