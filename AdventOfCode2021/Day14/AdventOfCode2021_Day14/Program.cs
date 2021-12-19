@@ -45,7 +45,22 @@ namespace AdventOfCode2021_Day14
         
         private static void SolvePuzzlePart2(string filename)
         {
-            throw new NotImplementedException();
+            // Note: Due to exponential growth of polymer, a different datastructure is needed to represent it than the actual sequence.
+            // For this puzzle, the actual sequence of the polymer is irrelevant. Only the pairs matter.
+            // Assuming worst case of all 26 characters being possible, then 676 pairs exist in worst case.
+            // A way better representation size than ~N*2^40, which is ~1.1e12.
+            var polymerizationEquipment = EfficientPolymerizationEquipment.FromFile(filename);
+
+            for (int i = 0; i < 40; i++)
+            {
+                polymerizationEquipment.PerformPairInsertionStep();
+            }
+
+            var numberOfMostCommonElement = polymerizationEquipment.CountMostCommonElement();
+            var numberOfLeastCommonElement = polymerizationEquipment.CountLeastCommonElement();
+            
+            Console.WriteLine("What do you get if you take the quantity of the most common element and subtract the quantity of the least common element?");
+            Console.WriteLine(numberOfMostCommonElement - numberOfLeastCommonElement);
         }
         
         private static PuzzleSolvingMode ParsePuzzleSolvingMode(string puzzlePartNumber)
