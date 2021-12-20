@@ -19,7 +19,7 @@ namespace AdventOfCode2021_Day16_tests
             {
                 0b0101
             };
-            byte result = _sut.GetBinaryData(data, 0, 4);
+            int result = _sut.GetBinaryData(data, 0, 4);
             
             Assert.Equal(0b0101, result);
         }
@@ -31,7 +31,7 @@ namespace AdventOfCode2021_Day16_tests
             {
                 0b0101
             };
-            byte result = _sut.GetBinaryData(data, 1, 2);
+            int result = _sut.GetBinaryData(data, 1, 2);
             
             Assert.Equal(0b10, result);
         }
@@ -43,7 +43,7 @@ namespace AdventOfCode2021_Day16_tests
             {
                 0b0101
             };
-            byte result = _sut.GetBinaryData(data, 0, 2);
+            int result = _sut.GetBinaryData(data, 0, 2);
             
             Assert.Equal(0b01, result);
         }
@@ -55,7 +55,7 @@ namespace AdventOfCode2021_Day16_tests
             {
                 0b0101
             };
-            byte result = _sut.GetBinaryData(data, 0, 3);
+            int result = _sut.GetBinaryData(data, 0, 3);
             
             Assert.Equal(0b010, result);
         }
@@ -67,7 +67,7 @@ namespace AdventOfCode2021_Day16_tests
             {
                 0b0101
             };
-            byte result = _sut.GetBinaryData(data, 3, 1);
+            int result = _sut.GetBinaryData(data, 3, 1);
             
             Assert.Equal(0b1, result);
         }
@@ -79,7 +79,7 @@ namespace AdventOfCode2021_Day16_tests
             {
                 0b0101
             };
-            byte result = _sut.GetBinaryData(data, 2, 1);
+            int result = _sut.GetBinaryData(data, 2, 1);
             
             Assert.Equal(0b0, result);
         }

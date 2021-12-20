@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 
 namespace AdventOfCode2021_Day16
@@ -32,9 +29,9 @@ namespace AdventOfCode2021_Day16
 
         private static void SolvePuzzlePart1(string filename)
         {
-            var packageHierachy = PackageHierarchy.FromFile(filename);
-            var packages = packageHierachy.GetAllPackagesRecursively();
-            var sumOfVersionNumbers = packages.Sum(packages => packages.VersionNumber);
+            var packetHierarchy = PacketHierarchy.FromFile(filename);
+            var packets = packetHierarchy.GetAllPacketsRecursively();
+            var sumOfVersionNumbers = packets.Sum(packet => packet.VersionNumber);
             Console.WriteLine("What do you get if you add up the version numbers in all packets?");
             Console.WriteLine(sumOfVersionNumbers);
         }
@@ -58,81 +55,39 @@ namespace AdventOfCode2021_Day16
         }
     }
 
-    internal class PackageHierarchy
+    internal class OperatorPacket : Packet
     {
-        public static PackageHierarchy FromFile(string filename)
+        public OperatorPacket(int version, int typeId, IReadOnlyCollection<Packet> packages)
+            : base(version, typeId)
         {
-            var binaryDataReader = new BinaryDataReader();
-            
-            var packageHierarchyInHexadecimal = File.ReadLines(filename).First();
-            var packageHierarchyInBinaryWords = packageHierarchyInHexadecimal
-                .Select(c => byte.Parse(c.ToString(), NumberStyles.HexNumber))
-                .ToArray();
-
-            var currentIndex = 0;
-            
-            byte version = binaryDataReader.GetBinaryData(packageHierarchyInBinaryWords, currentIndex, 3);
-            currentIndex += 3;
-            byte typeId = binaryDataReader.GetBinaryData(packageHierarchyInBinaryWords, currentIndex, 3);
-            currentIndex += 3;
-            switch (typeId)
-            {
-                case 4:
-                    byte literalChunk;
-                    long literalValue = 0;
-                    
-                    var safetyCounter = 1; // Exists to safeguard that `long` is large enough to store data
-                    do
-                    {
-                        Debug.Assert(safetyCounter < 16);
-
-                        literalChunk = binaryDataReader.GetBinaryData(packageHierarchyInBinaryWords, currentIndex, 5);
-                        currentIndex += 5;
-
-                        literalValue <<= 4;
-                        literalValue += literalChunk & 0b01111;
-
-                        safetyCounter++;
-                    } while ((literalChunk & 0b10000) > 0);
-
-                    var package = new LiteralValuePackage(version, typeId, literalValue);
-                    break;
-                default:
-                    // TODO: Some kind of nesting stuff
-                    break;
-            }
-
-            return null;
+            SubPackets = packages;
         }
 
-        public IEnumerable<Package> GetAllPackagesRecursively()
-        {
-            throw new NotImplementedException();
-        }
+        public IReadOnlyCollection<Packet> SubPackets { get; }
     }
 
-    internal class LiteralValuePackage : Package
+    internal class LiteralValuePacket : Packet
     {
         private readonly long _literalValue;
 
-        public LiteralValuePackage(byte version, byte typeId, long literalValue)
+        public LiteralValuePacket(int version, int typeId, long literalValue)
             : base(version, typeId)
         {
             _literalValue = literalValue;
         }
     }
 
-    internal abstract class Package
+    internal abstract class Packet
     {
-        protected Package(
-            byte versionNumber,
-            byte typeId)
+        protected Packet(
+            int versionNumber,
+            int typeId)
         {
             VersionNumber = versionNumber;
             TypeId = typeId;
         }
 
-        public byte VersionNumber { get; }
-        public byte TypeId { get; }
+        public int VersionNumber { get; }
+        public int TypeId { get; }
     }
 }

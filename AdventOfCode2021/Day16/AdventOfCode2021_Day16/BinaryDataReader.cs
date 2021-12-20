@@ -7,10 +7,10 @@ namespace AdventOfCode2021_Day16
     {
         private const int WordSize = 4;
 
-        public byte GetBinaryData(byte[] data, int index, int length)
+        public int GetBinaryData(byte[] data, int index, int length)
         {
             Debug.Assert(length > 0);
-            Debug.Assert(length <= 8);
+            Debug.Assert(length <= 32);
             Debug.Assert(index >= 0);
             Debug.Assert(index < data.Length*4);
             
@@ -18,7 +18,7 @@ namespace AdventOfCode2021_Day16
             var wordIndex = index % WordSize;
             
             var numberOfBitsRead = 0;
-            byte result = 0;
+            int result = 0;
             do
             {
                 byte word = data[arrayIndex];
@@ -36,7 +36,7 @@ namespace AdventOfCode2021_Day16
             return result;
         }
 
-        private static byte PostPendBits(byte result, byte binaryData, int numberOfBitsFromCurrentWord)
+        private static int PostPendBits(int result, byte binaryData, int numberOfBitsFromCurrentWord)
         {
             result <<= numberOfBitsFromCurrentWord;
             result += binaryData;
