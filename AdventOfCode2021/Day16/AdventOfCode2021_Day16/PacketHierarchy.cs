@@ -115,5 +115,7 @@ namespace AdventOfCode2021_Day16
                 }
             }
         }
+
+        public long GetEvaluatedValue() => _rootPacket.Value;
     }
 }

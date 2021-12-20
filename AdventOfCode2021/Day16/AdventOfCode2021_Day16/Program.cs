@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace AdventOfCode2021_Day16
@@ -38,7 +37,10 @@ namespace AdventOfCode2021_Day16
 
         private static void SolvePuzzlePart2(string filename)
         {
-            throw new NotImplementedException();
+            var packetHierarchy = PacketHierarchy.FromFile(filename);
+            long value = packetHierarchy.GetEvaluatedValue();
+            Console.WriteLine("What do you get if you evaluate the expression represented by your hexadecimal-encoded BITS transmission?");
+            Console.WriteLine(value);
         }
 
         private static PuzzleSolvingMode ParsePuzzleSolvingMode(string puzzlePartNumber)
@@ -53,41 +55,5 @@ namespace AdventOfCode2021_Day16
                 _ => throw new ArgumentException($"2nd argument only supports values in the range [1,2]. Received {number}", "args[1]")
             };
         }
-    }
-
-    internal class OperatorPacket : Packet
-    {
-        public OperatorPacket(int version, int typeId, IReadOnlyCollection<Packet> packages)
-            : base(version, typeId)
-        {
-            SubPackets = packages;
-        }
-
-        public IReadOnlyCollection<Packet> SubPackets { get; }
-    }
-
-    internal class LiteralValuePacket : Packet
-    {
-        private readonly long _literalValue;
-
-        public LiteralValuePacket(int version, int typeId, long literalValue)
-            : base(version, typeId)
-        {
-            _literalValue = literalValue;
-        }
-    }
-
-    internal abstract class Packet
-    {
-        protected Packet(
-            int versionNumber,
-            int typeId)
-        {
-            VersionNumber = versionNumber;
-            TypeId = typeId;
-        }
-
-        public int VersionNumber { get; }
-        public int TypeId { get; }
     }
 }
