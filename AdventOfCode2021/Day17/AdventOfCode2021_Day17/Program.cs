@@ -36,7 +36,11 @@ namespace AdventOfCode2021_Day17
 
         private static void SolvePuzzlePart2(string filename)
         {
-            throw new NotImplementedException();
+            var target = TargetArea.FromFile(filename);
+            var probeLauncher = new ProbeLauncher();
+            var initialVelocities = probeLauncher.GetAllInitialVelocitiesThatHitTarget(target);
+            Console.WriteLine("How many distinct initial velocity values cause the probe to be within the target area after any step?");
+            Console.WriteLine(initialVelocities.Count);
         }
 
         private static PuzzleSolvingMode ParsePuzzleSolvingMode(string puzzlePartNumber)
